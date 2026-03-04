@@ -147,7 +147,7 @@ var CharacterStateManager = {
         } else if (hour >= 14 && hour < 18) {
             thoughts = ['有點累了...', '想快點見到' + playerName, '還有些事情沒做完', '發呆中...'];
         } else if (hour >= 18 && hour < 22) {
-            thoughts = ['終於可以休息了', '想和' + playerName + '聊天', '在看劇/打遊戲', '今晚吃什麼呢'];
+            thoughts = ['終於可以休息了', '想和' + playerName + '聊天', '看劇', '打遊戲', '今晚吃什麼呢'];
         } else { // 深夜
             thoughts = ['該睡覺了', '捨不得睡...', '不知道' + playerName + '睡了沒', '晚安...'];
         }
