@@ -54,6 +54,7 @@
             <!-- 3. LINE App (聊天列表/通訊錄) -->
             <div id="wechat-app" class="app-window">
                 <div class="app-header">
+                    <i class="fas fa-chevron-left" onclick="closeApp('wechat')"></i>
                     <div class="app-title">LINE</div>
                     <div class="header-actions">
                         <!-- 這裡把加好友按鈕保留，因為 LINE 主頁右上角也有 -->
@@ -204,6 +205,13 @@
                         <div class="setting-item toggle">
                             <span>AI 發送貼圖</span>
                             <label class="switch"><input type="checkbox" id="sticker-toggle"><span class="slider"></span></label>
+                        </div>
+                    </div>
+                    <!-- ★★★ 新增這一段：版本號碼顯示 ★★★ -->
+                            <div style="text-align: center; color: #aaa; font-size: 12px; padding: 20px; margin-top: 20px;">
+                                CodeViolet v0.0.1
+                                <br>By KF-55
+                            </div>
                         </div>
                     </div>
                 </div>
