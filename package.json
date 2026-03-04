@@ -1,0 +1,16 @@
+{
+  "name": "codeviolet_app",
+  "homepage": "https://kingfish55555.github.io/codeviolet/",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+  "deploy": "gh-pages -d ."
+},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  }
+}
