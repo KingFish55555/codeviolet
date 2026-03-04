@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>COD 互動手機</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 手機外框 -->
+    <div class="phone-container">
+        <div class="screen">
+            
+            <!-- 通知與彈窗 -->
+            <div id="toast">提示訊息</div>
+            
+            <!-- 1. 鎖定畫面 -->
+            <div id="lockscreen" class="page active">
+                <div id="lock-bg" class="wallpaper"></div>
+                <div class="lock-content">
+                    <div id="lock-time" class="time-big">12:00</div>
+                    <div id="lock-date" class="date">1月1日 星期一</div>
+                    <div class="unlock-hint">向上滑動解鎖</div>
+                </div>
+            </div>
+
+            <!-- 2. 主畫面 (桌面) -->
+            <div id="homescreen" class="page">
+                <div id="home-bg" class="wallpaper"></div>
+                <div id="home-time" class="status-bar-time">12:00</div>
+                
+                <div class="app-grid">
+                    <!-- LINE (內部ID維持 wechat 以配合舊邏輯) -->
+                    <div class="app-icon" onclick="openApp('wechat')">
+                        <div class="icon-img line-icon"><i class="fab fa-line"></i></div>
+                        <div class="icon-name">LINE</div>
+                        <div id="badge-chat" class="badge" style="display:none">0</div>
+                    </div>
+                    <!-- 設定 -->
+                    <div class="app-icon" onclick="openApp('settings')">
+                        <div class="icon-img settings-icon"><i class="fas fa-cog"></i></div>
+                        <div class="icon-name">設定</div>
+                    </div>
+                    <!-- 相簿 -->
+                    <div class="app-icon" onclick="openApp('photos')">
+                        <div class="icon-img photos-icon"><i class="fas fa-images"></i></div>
+                        <div class="icon-name">相簿</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. LINE App (聊天列表/通訊錄) -->
+            <div id="wechat-app" class="app-window">
+                <div class="app-header">
+                    <div class="app-title">LINE</div>
+                    <div class="header-actions">
+                        <!-- 這裡把加好友按鈕保留，因為 LINE 主頁右上角也有 -->
+                        <i class="fas fa-user-plus" onclick="openAddCharacterModal()"></i>
+                    </div>
+                </div>
+                
+                <!-- 分頁內容 -->
+                <!-- 聊天列表 (預設顯示) -->
+                <div class="tab-content active" id="tab-chats">
+                    <div id="chat-list-container"></div>
+                </div>
+                <!-- 好友列表 -->
+                <div class="tab-content" id="tab-contacts">
+                    <div id="contacts-list-container"></div>
+                </div>
+
+                <!-- 底部導航 -->
+                <div class="app-tab-bar">
+                    <div class="tab-item" onclick="switchWechatTab('contacts')">
+                        <i class="fas fa-users"></i><div>好友</div>
+                    </div>
+                    <div class="tab-item active" onclick="switchWechatTab('chats')">
+                        <i class="fas fa-comment"></i><div>聊天</div>
+                    </div>
+                    <div class="tab-item" onclick="openApp('settings')">
+                        <i class="fas fa-ellipsis-h"></i><div>設定</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. 聊天室視窗 -->
+            <div id="chat-page" class="sub-page">
+                <div class="chat-header">
+                    <i class="fas fa-chevron-left" onclick="closeChat()"></i>
+                    <div id="chat-header-name">角色名</div>
+                    <i class="fas fa-bars" onclick="openChatSettingsPage()"></i>
+                </div>
+                <div id="chat-box"></div>
+                
+                <div class="chat-footer">
+                    <i class="fas fa-plus" onclick="togglePlus()"></i>
+                    <i class="fas fa-camera" onclick="document.getElementById('img-input').click()"></i>
+                    <div class="input-wrapper">
+                        <div id="msg-input" contenteditable="true"></div>
+                        <i class="far fa-smile" onclick="openStickerPanel()"></i>
+                    </div>
+                    <div id="send-btn" onclick="sendMessage()">發送</div>
+                </div>
+
+                <!-- 貼圖面板 -->
+                <div id="sticker-panel">
+                    <div class="sticker-tabs">
+                        <div class="sticker-tab active" data-tab="mine" onclick="switchStickerTab('mine')">我的貼圖</div>
+                        <div class="sticker-tab" data-tab="char" onclick="switchStickerTab('char')">收藏</div>
+                    </div>
+                    <div id="sticker-grid"></div>
+                    <div class="sticker-add-btn" onclick="document.getElementById('sticker-input').click()">
+                        <i class="fas fa-plus"></i> 新增貼圖
+                    </div>
+                </div>
+
+                <!-- +號選單 -->
+                <div id="plus-panel">
+                    <div class="plus-item" onclick="document.getElementById('img-input').click()">
+                        <div class="plus-icon"><i class="fas fa-image"></i></div>
+                        <div class="plus-name">相簿</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 隱藏的檔案輸入 -->
+            <input type="file" id="img-input" accept="image/*" style="display:none">
+            <input type="file" id="sticker-input" accept="image/*" style="display:none">
+            <input type="file" id="add-char-avatar-input" accept="image/*" style="display:none">
+            <input type="file" id="avatar-player-input" accept="image/*" style="display:none">
+
+            <!-- 5. 個人資料頁 -->
+            <div id="character-profile" class="sub-page">
+                <div class="profile-header">
+                    <i class="fas fa-chevron-left" onclick="closePage('character-profile')"></i>
+                </div>
+                <div class="profile-content">
+                    <div id="profile-avatar" class="profile-avatar-large"></div>
+                    <div id="profile-name" class="profile-name-large"></div>
+                    <div id="profile-id" class="profile-id-text"></div>
+                    <div id="profile-bio" class="profile-bio-text"></div>
+                    
+                    <div id="profile-status-box">
+                        <!-- 狀態會由 JS 插入 -->
+                    </div>
+
+                    <div class="profile-actions">
+                        <button onclick="openChatWithCurrent()">聊天</button>
+                        <button onclick="openEditRemark()">設定備註</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. 新增角色頁面 -->
+            <div id="add-character-page" class="sub-page" style="background:#fff">
+                <div class="sub-header">
+                    <i class="fas fa-arrow-left" onclick="closePage('add-character-page')"></i>
+                    <span>新增聯絡人</span>
+                    <span onclick="saveNewCharacter()" style="color:#06C755;font-weight:bold">儲存</span>
+                </div>
+                <div class="settings-content">
+                    <div class="avatar-upload-area" onclick="triggerAddCharAvatar()">
+                        <div id="add-char-avatar-preview">+</div>
+                        <div>上傳頭貼</div>
+                    </div>
+                    <div class="input-group">
+                        <label>名字</label>
+                        <input type="text" id="add-char-name" placeholder="例如：Ghost">
+                    </div>
+                    <div class="input-group">
+                        <label>開場白</label>
+                        <input type="text" id="add-char-first" placeholder="第一次見面他說的話...">
+                    </div>
+                    <div class="input-group">
+                        <label>人設 (Prompt)</label>
+                        <textarea id="add-char-prompt" placeholder="你是誰？個性如何？說話語氣..." style="height:150px"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. 設定 App -->
+            <div id="settings-app" class="app-window" style="background:#f5f5f5">
+                <div class="app-header">
+                    <i class="fas fa-chevron-left" onclick="closeApp('settings')"></i>
+                    <div class="app-title">設定</div>
+                </div>
+                <div class="settings-list">
+                    <div class="setting-group">
+                        <div class="setting-item" onclick="openPage('api-settings')">API 設定 (Gemini/OpenAI)</div>
+                        <div class="setting-item" onclick="openPage('name-settings')">修改我的名字</div>
+                        <div class="setting-item" onclick="document.getElementById('avatar-player-input').click()">修改我的頭貼</div>
+                    </div>
+                    <div class="setting-group">
+                        <div class="setting-item toggle">
+                            <span>AI 互動</span>
+                            <label class="switch"><input type="checkbox" id="ai-toggle"><span class="slider"></span></label>
+                        </div>
+                        <div class="setting-item toggle">
+                            <span>角色主動訊息</span>
+                            <label class="switch"><input type="checkbox" id="auto-msg-toggle"><span class="slider"></span></label>
+                        </div>
+                        <div class="setting-item toggle">
+                            <span>AI 發送貼圖</span>
+                            <label class="switch"><input type="checkbox" id="sticker-toggle"><span class="slider"></span></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API 設定頁面 -->
+            <div id="api-settings" class="sub-page">
+                <div class="sub-header">
+                    <i class="fas fa-arrow-left" onclick="closePage('api-settings')"></i>
+                    <span>API 設定</span>
+                    <span onclick="saveAPI()">儲存</span>
+                </div>
+                <div class="settings-content">
+                    <!-- 1. 選擇服務商 -->
+                    <div class="input-group">
+                        <label>服務供應商</label>
+                        <select id="api-provider" class="input-full" onchange="toggleApiUrlInput()" style="padding:10px; border:1px solid #ddd; border-radius:8px; width:100%; background:white;">
+                            <option value="openai">OpenAI (GPT)</option>
+                            <option value="gemini">Google Gemini</option>
+                            <option value="deepseek">DeepSeek</option>
+                            <option value="anthropic">Anthropic (Claude)</option>
+                            <option value="custom">自訂 (其他中轉站)</option>
+                        </select>
+                    </div>
+
+                    <!-- 2. API URL (預設隱藏，由程式自動填入) -->
+                    <div class="input-group" id="api-url-group" style="display:none;">
+                        <label>API 網址 (URL)</label>
+                        <input type="text" id="api-url" placeholder="https://...">
+                    </div>
+
+                    <!-- 3. API Key -->
+                    <div class="input-group">
+                        <label>API 金鑰 (Key)</label>
+                        <input type="password" id="api-key" placeholder="sk-...">
+                    </div>
+
+                    <!-- 4. 模型選擇 (測試連線後自動抓取) -->
+                    <div class="input-group">
+                        <label>使用模型</label>
+                        <select id="api-model" class="input-full" style="padding:10px; border:1px solid #ddd; border-radius:8px; width:100%; background:white;">
+                            <option value="" disabled selected>請先輸入 Key 並測試連線...</option>
+                        </select>
+                    </div>
+
+                    <button class="btn-primary" onclick="testAPI()">測試連線 & 抓取模型</button>
+                </div>
+
+            <!-- 名字設定頁面 -->
+            <div id="name-settings" class="sub-page">
+                <div class="sub-header">
+                    <i class="fas fa-arrow-left" onclick="closePage('name-settings')"></i>
+                    <span>修改名字</span>
+                    <span onclick="saveName()">儲存</span>
+                </div>
+                <div class="settings-content">
+                    <input type="text" id="input-name" class="input-full">
+                </div>
+            </div>
+
+        </div> <!-- End Screen -->
+    </div> <!-- End Phone Container -->
+
+    <!-- 載入 JS -->
+    <script src="js/cod_core.js"></script>
+    <script src="js/cod_app.js"></script>
+    <script src="js/cod_chat.js"></script>
+</body>
+</html>
